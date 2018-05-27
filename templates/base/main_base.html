@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+
+  <title>{% block title %}Mini Seos{% endblock %}</title>
+
+  {# Extiende las librerias #}
+  {%  include "base/main_head.html" %}
+
+  {# Bloque para librerias en el head del DOM #}
+  {% block head_libs %}
+  {% endblock %}
+</head>
+<body>
+  {# Bloque para librerias en el comienzo del body #}
+  {% block body_header %}
+  {% endblock %}
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('select').material_select();
+    });
+  </script>
+
+  <!-- Dropdown Structure -->
+  <ul id='dropdown1' class='dropdown-content'>
+    <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Salir</a></li>
+  </ul>
+  <nav class="grey darken-2">
+    <!-- Lista que se oculta -->
+    <ul id="slide-out" class="side-nav">
+    <li><div class="user-view">
+      <div class="background">
+        <img src="{% static 'images/Super-Abstract-Wallpaper-380x250.jpg' %}">
+      </div>
+      <a href="#"><img class="circle" src="{% static 'images/sho.jpg'%}"></a>
+      <a href="#"><span class="white-text name">{{ user.first_name }}</span></a>
+      <a href="#"><span class="white-text email">{{ user.email }}</span></a>
+    </div></li>
+    <li class="no-padding">
+      <ul class="collapsible collapsible-accordion">
+        <li>
+          <a class="collapsible-header waves-effect waves-cyan">
+            <i class="far fa-credit-card"></i>
+            <span class="nav-text">Facturación</span>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li><a href="#!">Caja</a></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a class="collapsible-header waves-effect waves-cyan">
+            <i class="fas fa-box-open"></i>
+            <span class="nav-text">Inventario</span>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li><a href="{% url 'inventario:inv_inicio' %}">Maestros</a></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a class="collapsible-header waves-effect waves-cyan">
+            <i class="fas fa-book"></i>
+            <span class="nav-text">Contabilidad</span>
+          </a>
+        </li>
+        <li>
+          <a class="collapsible-header waves-effect waves-cyan">
+            <i class="fas fa-users"></i>
+            <span class="nav-text">CRM</span>
+          </a>
+        </li>
+        <li><div class="divider"></div></li>
+        <li><a href="{% url 'logout' %}" class="collapsible-header waves-effect waves-cyan">
+          <i class="fas fa-sign-out-alt"></i>Salir</a>
+        </li>
+      </ul>
+    </li>
+    </ul>
+    <!-- Lista de botones del NAV -->
+    <ul class="right hide-on-med-and-down">
+      <li><a href="#"><i class="material-icons">search</i></a></li>
+      <li><a href="#"><i class="material-icons">view_module</i></a></li>
+      <li><a href="#"><i class="material-icons">refresh</i></a></li>
+      <li><a href="#"><i class="material-icons">more_vert</i></a></li>
+      <li><a class="dropdown-button" href="#!" data-activates="dropdown1">Inicio<i class="material-icons right">arrow_drop_down</i></a></li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="fab fa-xing"></i></a>
+    <a href="#" style="font-style: italic; font-weight: bold; font-size: large">Mini SEOS</a>
+  </nav>
+  <script type="text/javascript">
+    $('.button-collapse').sideNav({
+      menuWidth: 300, // Default is 240
+      edge: 'left', // Choose the horizontal origin
+      closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
+    });
+    $('.collapsible').collapsible();
+  </script>
+
+  {# Bloque para el body #}
+  <div id="main_container" class="container">
+    {% block body_container %}
+    {% endblock %}
+  </div>
+
+  {# Bloque para javascript al final del body #}
+  {% block body_js %}
+  {% endblock %}
+
+  {# Bloque para el footer #}
+  {% block body_footer %}
+  {% endblock %}
+</body>
+</html>
