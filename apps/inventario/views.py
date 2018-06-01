@@ -1,8 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Grupo, Marca, Item
+from .models import Grupo, Marca, Item, ItemPrecios
 from .forms import GrupoForm, MarcaForm, ItemForm
+
+import datetime
 
 
 """ESTADOS MAESTOS"""
@@ -50,7 +52,7 @@ def get_grupo(request, pk, mode):
                 return redirect('inventario:inv_inicio')
         else:
             form = GrupoForm
-        return render(request, 'inventario/inv_marcas.html', {'form': form})
+        return render(request, 'inventario/inv_grupos.html', {'form': form})
     else:
         grupo = get_object_or_404(Grupo, pk=pk)
         if request.method == 'POST':
@@ -98,6 +100,9 @@ def get_marca(request, pk, mode):
 
 @login_required
 def get_item(request, pk, mode):
+    # fecVigencia = datetime.datetime.now()
+    fecVigencia = '31-05-2018'
+    precio = '3,33'
     if mode == "INS":
         if request.method == "POST":
             form = ItemForm(request.POST)
@@ -110,6 +115,7 @@ def get_item(request, pk, mode):
         return render(request, 'inventario/inv_items.html', {'form': form})
     else:
         item = get_object_or_404(Item, pk=pk)
+        precios = ItemPrecios.objects.filter(item__codigo=item.codigo)
         if request.method == 'POST':
             form = ItemForm(data=request.POST, instance=item)
             if form.is_valid():
@@ -125,4 +131,21 @@ def get_item(request, pk, mode):
                     'grupo': item.grupo,
                     'marca': item.marca,}
             form = ItemForm(initial=data)
-        return render(request, 'inventario/inv_items.html', {'form': form})
+        return render(request, 'inventario/inv_items.html', {'form': form,
+                                                             'item': item,
+                                                             'item_precios': precios,
+                                                             'fecVigencia': fecVigencia,
+                                                             'precio': precio})
+
+@login_required
+def get_precio(request, pk, fecVigencia, precio):
+    print(request)
+    pass
+
+
+def set_precio(request, item_pk):
+    pass
+    # item = get_object_or_404(Item, pk=item_pk)
+    # if item:
+    #     item_precio = ItemPrecios(item=item, fecVigencia=fecVigencia, precio=precio)
+    #     item_precio.save()

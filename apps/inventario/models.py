@@ -88,3 +88,22 @@ class Item(models.Model):
 
     def __str__(self):
         return self.codigo.strip() + ' ' + self.nombre.strip()
+
+
+class ItemPrecios(models.Model):
+    item = models.ForeignKey(Item,
+                             db_column="itmCodigo",
+                             on_delete=models.CASCADE,
+                             )
+    fecVigencia = models.DateTimeField(db_column="itmPreFecVigencia")
+    precio = models.DecimalField(max_digits=9, decimal_places=2, db_column="itmPrecio")
+    models.DateTimeField(auto_now_add=True, db_column="itmFecCreacion")
+    usuarioModificacion = models.CharField(max_length=10, db_column="itmUsrModificacion")
+    fechaModificacion = models.DateTimeField(auto_now=True, db_column="itmFecModificacion")
+
+    class Meta:
+        db_table = 'inv_items_precios'
+        unique_together = (('item', 'fecVigencia'),)
+
+    def __str__(self):
+        return self.item.nombre.strip() + ' ' + self.fecVigencia.__str__() + ' ' + self.precio.__str__()

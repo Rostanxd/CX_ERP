@@ -5,13 +5,92 @@
 {% endblock %}
 
 {% block body_container %}
-  <form action="" method="post" style="padding-top: 15px">
-    {% csrf_token %}
-    {% form form=form %}{% endform %}
-    <input class="waves-effect waves-light btn" type="submit" value="Registrar"/>
-    <a class="waves-effect waves-light btn red lighten-1" href="{% url 'inventario:inv_inicio' %}">
-      Cancelar</a>
-  </form>
+  <div class="row">
+    <div class="col s12 m6 l6">
+      <h5>Detalles del Item</h5>
+      <form action="" method="post" style="padding-top: 15px">
+        {% csrf_token %}
+        {% form form=form %}{% endform %}
+        <input class="waves-effect waves-light btn" type="submit" value="Registrar"/>
+        <a class="waves-effect waves-light btn red lighten-1" href="{% url 'inventario:inv_inicio' %}">
+          Cancelar</a>
+      </form>
+    </div>
+    <div class="col s12 m6 l6">
+      <h5>Histórico de Precios</h5>
+      <table class="highlight striped">
+        <thead>
+          <tr>
+            <th style="text-align: center">Fecha</th>
+              <th style="text-align: center">Precio</th>
+              <th style="text-align: center">Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if item_precios %}
+              {% for ip in item_precios %}
+                <tr>
+                  <td>{{ ip.fecVigencia }}</td>
+                  <td style="text-align: right">$ {{ ip.precio }}</td>
+                  <td style="text-align: center">
+                    <a href="#" class="blue-grey-text">
+                      <i class="fas fa-edit"></i></a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="3">No hay registros.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+      </table>
+      <div style="padding-top: 25px;">
+        <h5>Ingresar nuevo precio</h5>
+      </div>
+      <form action="" method="POST" style="padding-top: 25px;">
+        {% csrf_token %}
+        <div class="input-field col s6 m5 l5">
+          <label for="fecVigencia">Fecha Vigencia:</label>
+          <input id="fecVigencia" name="fecVigencia" type="text" class="datepicker" value="{{ fecVigencia }}">
+        </div>
+        <div class="input-field col s6 m5 l5">
+          <label for="codigo">Nuevo Precio:</label>
+          <input id="codigo" type="text" name="precio" value="{{ precio }}">
+        </div>
+        <div class="col s6 m2 l2">
+          <a class="waves-effect waves-light btn green lighten-2"
+             href="{% url 'inventario:set_precio' item.pk fecVigencia precio %}">+</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block document_ready_js %}
+{% endblock %}
+
+{% block body_js %}
+  {# Inicializador del DatePicker #}
+  <script type="text/javascript">
+    	$('.datepicker').pickadate({
+        labelMonthNext: 'Mes anterior',
+        labelMonthPrev: 'Mes siguiente',
+        labelMonthSelect: 'Seleccione un mes',
+        labelYearSelect: 'Seleccione un año',
+        selectMonths: true,
+        selectYears: 99,
+        monthsFull: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        monthsShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+        weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+        today: '',
+        clear: 'Clear',
+        close: 'Ok',
+{#        max: true,#}
+        format: 'dd/mm/yyyy',
+        closeOnSelect: true
+    	});
+  </script>
 {% endblock %}
 
 {% block footer %}
