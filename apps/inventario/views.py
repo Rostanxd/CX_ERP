@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Grupo, Marca, Item, ItemPrecios
 from .forms import GrupoForm, MarcaForm, ItemForm
 
 import datetime
-
 
 """ESTADOS MAESTOS"""
 ACTIVO = 'A'
@@ -30,7 +30,6 @@ ESTADOS_TRANSACCIONALES = [
 
 @login_required
 def inicio(request):
-
     grupos = Grupo.objects.all()
     marcas = Marca.objects.all()
     items = Item.objects.all()
@@ -100,9 +99,10 @@ def get_marca(request, pk, mode):
 
 @login_required
 def get_item(request, pk, mode):
-    # fecVigencia = datetime.datetime.now()
-    fecVigencia = '31-05-2018'
-    precio = '3,33'
+    fecha = datetime.datetime.now().strftime("%d-%m-%Y")
+    tiempo = datetime.datetime.now().strftime("%H:%M%p")
+    precio = 0
+
     if mode == "INS":
         if request.method == "POST":
             form = ItemForm(request.POST)
@@ -134,8 +134,10 @@ def get_item(request, pk, mode):
         return render(request, 'inventario/inv_items.html', {'form': form,
                                                              'item': item,
                                                              'item_precios': precios,
-                                                             'fecVigencia': fecVigencia,
+                                                             'fecha': fecha,
+                                                             'tiempo': tiempo,
                                                              'precio': precio})
+
 
 @login_required
 def get_precio(request, pk, fecVigencia, precio):
@@ -143,9 +145,23 @@ def get_precio(request, pk, fecVigencia, precio):
     pass
 
 
-def set_precio(request, item_pk):
-    pass
-    # item = get_object_or_404(Item, pk=item_pk)
-    # if item:
-    #     item_precio = ItemPrecios(item=item, fecVigencia=fecVigencia, precio=precio)
-    #     item_precio.save()
+def set_precio(request):
+    # Se obtienen los valores del post
+    item_pk = request.POST.get('item_pk', '')
+    fecha_vigencia = request.POST.get('fecha_vigencia', datetime.datetime.today().strftime('%d-%m-%Y'))
+    precio = request.POST.get('precio', 0.00)
+
+    item = get_object_or_404(Item, pk=item_pk)
+    date = datetime.datetime.strptime(fecha_vigencia, '%d-%m-%Y')
+    time = datetime.datetime.time(datetime.datetime.today())
+    fecha_nueva = datetime.datetime.combine(date, time)
+
+    # Insert del precio del item.
+    item_precio = ItemPrecios(item=item, fecVigencia=fecha_nueva, precio=precio)
+    item_precio.save()
+
+    data = {
+        'mensaje': 'Conexion con el back end.'
+    }
+
+    return JsonResponse(data)

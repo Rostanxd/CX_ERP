@@ -23,7 +23,6 @@
           <tr>
             <th style="text-align: center">Fecha</th>
               <th style="text-align: center">Precio</th>
-              <th style="text-align: center">Editar</th>
             </tr>
           </thead>
           <tbody>
@@ -32,10 +31,6 @@
                 <tr>
                   <td>{{ ip.fecVigencia }}</td>
                   <td style="text-align: right">$ {{ ip.precio }}</td>
-                  <td style="text-align: center">
-                    <a href="#" class="blue-grey-text">
-                      <i class="fas fa-edit"></i></a>
-                  </td>
                 </tr>
               {% endfor %}
             {% else %}
@@ -48,19 +43,22 @@
       <div style="padding-top: 25px;">
         <h5>Ingresar nuevo precio</h5>
       </div>
-      <form action="" method="POST" style="padding-top: 25px;">
+      <form method="post">
         {% csrf_token %}
-        <div class="input-field col s6 m5 l5">
-          <label for="fecVigencia">Fecha Vigencia:</label>
-          <input id="fecVigencia" name="fecVigencia" type="text" class="datepicker" value="{{ fecVigencia }}">
+        <div class="input-field col s4 m4 l4">
+          <label for="fecha_vigencia">Fecha:</label>
+          <input id="fecha_vigencia" name="fecha_vigencia" type="text" class="datepicker" value="{{ fecha }}">
         </div>
-        <div class="input-field col s6 m5 l5">
-          <label for="codigo">Nuevo Precio:</label>
-          <input id="codigo" type="text" name="precio" value="{{ precio }}">
+        <div class="input-field col s4 m4 l4">
+          <label for="tiempo_vigencia">Tiempo:</label>
+          <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" {{ tiempo }}>
         </div>
-        <div class="col s6 m2 l2">
-          <a class="waves-effect waves-light btn green lighten-2"
-             href="{% url 'inventario:set_precio' item.pk fecVigencia precio %}">+</a>
+        <div class="input-field col s4 m4 l4">
+          <label for="precio">Nuevo Precio:</label>
+          <input id="precio" name="precio" type="number" step="any" value="{{ precio }}">
+        </div>
+        <div class="col s12 m2 l2">
+          <a id="add_item" class="waves-effect waves-light btn green lighten-2">Agregar</a>
         </div>
       </form>
     </div>
@@ -73,23 +71,74 @@
 {% block body_js %}
   {# Inicializador del DatePicker #}
   <script type="text/javascript">
-    	$('.datepicker').pickadate({
-        labelMonthNext: 'Mes anterior',
-        labelMonthPrev: 'Mes siguiente',
-        labelMonthSelect: 'Seleccione un mes',
-        labelYearSelect: 'Seleccione un año',
-        selectMonths: true,
-        selectYears: 99,
-        monthsFull: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-        monthsShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-        weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
-        today: '',
-        clear: 'Clear',
-        close: 'Ok',
+    $('.datepicker').pickadate({
+      labelMonthNext: 'Mes anterior',
+      labelMonthPrev: 'Mes siguiente',
+      labelMonthSelect: 'Seleccione un mes',
+      labelYearSelect: 'Seleccione un año',
+      selectMonths: true,
+      selectYears: 99,
+      monthsFull: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      monthsShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+      weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+      today: '',
+      clear: 'Clear',
+      close: 'Ok',
 {#        max: true,#}
-        format: 'dd/mm/yyyy',
-        closeOnSelect: true
-    	});
+      format: 'dd-mm-yyyy',
+      closeOnSelect: true
+    });
+
+    $('.timepicker').pickatime();
+  </script>
+  <script>
+    $('#add_item').click(function (e) {
+      var item_pk = $('#id_codigo').val()
+      var fecha_vigencia = $('#fecha_vigencia').val();
+      var tiempo_vigencia = $('#tiempo_vigencia').val();
+      var precio = $('#precio').val();
+      var flag = false;
+
+      if (precio != 0 && fecha_vigencia != '' && tiempo_vigencia != '') {
+        flag = true;
+      }else{
+        flag = false;
+        alert('Por favor ingrese todos los datos para el nuevo precio...')
+      }
+
+      if (flag) {
+        if (confirm("Desea agregar el nuevo precio ?") == true) {
+
+          console.log('#add_item: click');
+          console.log('>> Insertando precio de item, mediante ajax.');
+          e.preventDefault();
+
+          $.ajax({
+            type: 'POST',
+            url: '/inventario/item_set_precio/',
+            data: {
+              csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+              'item_pk': item_pk,
+              'fecha_vigencia': fecha_vigencia,
+              'tiempo_vigencia': tiempo_vigencia,
+              'precio': precio
+            },
+            datetype: 'json',
+            success: function (data) {
+              if (data.mensaje) {
+                alert('Ha sido agregado el nuevo precio!');
+                setTimeout(function () {  // espera por 0.5 segundos
+                  location.reload(); // luego recarga la página
+                }, 500);
+              }
+            },
+            error: function (data) {
+              alert('Ups! ocurrió un error!');
+            }
+          });
+        }
+      }
+    });
   </script>
 {% endblock %}
 
