@@ -47,18 +47,34 @@
         {% csrf_token %}
         <div class="input-field col s4 m4 l4">
           <label for="fecha_vigencia">Fecha:</label>
-          <input id="fecha_vigencia" name="fecha_vigencia" type="text" class="datepicker" value="{{ fecha }}">
+          {% if mode != 'INS' %}
+            <input id="fecha_vigencia" name="fecha_vigencia" type="text" class="datepicker" value="{{ fecha }}">
+          {% else %}
+            <input id="fecha_vigencia" name="fecha_vigencia" type="text" class="datepicker" value="{{ fecha }}" disabled>
+          {% endif %}
         </div>
         <div class="input-field col s4 m4 l4">
           <label for="tiempo_vigencia">Tiempo:</label>
-          <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" {{ tiempo }}>
+          {% if mode != 'INS' %}
+            <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" {{ tiempo }}>
+          {% else %}
+            <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" {{ tiempo }} disabled>
+          {% endif %}
         </div>
         <div class="input-field col s4 m4 l4">
           <label for="precio">Nuevo Precio:</label>
-          <input id="precio" name="precio" type="number" step="any" value="{{ precio }}">
+          {% if mode != 'INS' %}
+            <input id="precio" name="precio" type="number" step="any" value="{{ precio }}">
+          {% else %}
+            <input id="precio" name="precio" type="number" step="any" value="{{ precio }}" disabled>
+          {% endif %}
         </div>
         <div class="col s12 m2 l2">
-          <a id="add_item" class="waves-effect waves-light btn green lighten-2">Agregar</a>
+          {% if mode != 'INS' %}
+            <a id="add_item" class="waves-effect waves-light btn green lighten-2">Agregar</a>
+          {% else %}
+            <a id="add_item" class="waves-effect waves-light btn green lighten-2" disabled>Agregar</a>
+          {% endif %}
         </div>
       </form>
     </div>

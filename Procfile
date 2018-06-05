@@ -1,0 +1,1 @@
+web: gunicorn CX_ERP.wsgi

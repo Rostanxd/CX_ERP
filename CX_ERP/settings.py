@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.urls import reverse_lazy
@@ -137,3 +138,5 @@ LOGOUT_REDIRECT_URL = reverse_lazy('login')
 
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_root")
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_root")
+
+django_heroku.settings(locals())

@@ -112,10 +112,11 @@ def get_item(request, pk, mode):
                 return redirect('inventario:inv_inicio')
         else:
             form = ItemForm
-        return render(request, 'inventario/inv_items.html', {'form': form})
+        return render(request, 'inventario/inv_items.html', {'form': form,
+                                                             'mode': mode})
     else:
         item = get_object_or_404(Item, pk=pk)
-        precios = ItemPrecios.objects.filter(item__codigo=item.codigo)
+        item_precios = ItemPrecios.objects.filter(item__codigo=item.codigo).order_by('-fecVigencia')
         if request.method == 'POST':
             form = ItemForm(data=request.POST, instance=item)
             if form.is_valid():
@@ -133,7 +134,7 @@ def get_item(request, pk, mode):
             form = ItemForm(initial=data)
         return render(request, 'inventario/inv_items.html', {'form': form,
                                                              'item': item,
-                                                             'item_precios': precios,
+                                                             'item_precios': item_precios,
                                                              'fecha': fecha,
                                                              'tiempo': tiempo,
                                                              'precio': precio})
