@@ -17,7 +17,6 @@
           <table class="striped">
             <thead>
               <tr>
-                <th style="text-align: center">Código</th>
                 <th style="text-align: center">Nombre</th>
                 <th style="text-align: center">Estado</th>
                 <th style="text-align: center">Editar</th>
@@ -27,9 +26,8 @@
               {% if grupos_all %}
                 {% for grupo in grupos_all %}
                   <tr>
-                    <td>{{ grupo.codigo }}</td>
                     <td>{{ grupo.nombre }}</td>
-                    <td>{{ grupo.estado_nombre }}</td>
+                    <td style="text-align: center">{{ grupo.estado_nombre }}</td>
                     <td style="text-align: center">
                       <a href="{% url 'inventario:get_grupo' grupo.pk 'UPD' %}" class="blue-grey-text"><i class="fas fa-edit"></i></a>
                     </td>
@@ -92,7 +90,6 @@
           <table class="striped">
             <thead>
               <tr>
-                <th style="text-align: center">Código</th>
                 <th style="text-align: center">Nombre</th>
                 <th style="text-align: center">Estado</th>
                 <th style="text-align: center">Editar</th>
@@ -102,9 +99,8 @@
               {% if marcas_all %}
                 {% for marca in marcas_all %}
                   <tr>
-                    <td>{{ marca.codigo }}</td>
                     <td>{{ marca.nombre }}</td>
-                    <td>{{ marca.estado_nombre }}</td>
+                    <td style="text-align: center">{{ marca.estado_nombre }}</td>
                     <td style="text-align: center">
                       <a href="{% url 'inventario:get_marca' marca.pk 'UPD' %}" class="blue-grey-text"><i class="fas fa-edit"></i></a>
                     </td>

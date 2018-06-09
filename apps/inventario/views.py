@@ -45,8 +45,16 @@ def get_grupo(request, pk, mode):
     if mode == "INS":
         if request.method == "POST":
             form = GrupoForm(request.POST)
+
+            print(form)
             if form.is_valid():
                 grupo = form.save()
+
+                # Auditoria
+                grupo.gruFecCreacion = datetime.datetime.now()
+                grupo.usuarioCreacion = request.user.username
+
+                # Commit del grupo
                 grupo.save()
                 return redirect('inventario:inv_inicio')
         else:
@@ -54,6 +62,11 @@ def get_grupo(request, pk, mode):
         return render(request, 'inventario/inv_grupos.html', {'form': form})
     else:
         grupo = get_object_or_404(Grupo, pk=pk)
+
+        # Auditoria
+        grupo.usuarioModificacion = request.user.username
+        grupo.fechaModificacion = datetime.datetime.now()
+
         if request.method == 'POST':
             form = GrupoForm(data=request.POST, instance=grupo)
             if form.is_valid():
@@ -63,19 +76,23 @@ def get_grupo(request, pk, mode):
             else:
                 print('No valid form')
         else:
-            data = {'codigo': grupo.codigo, 'nombre': grupo.nombre, 'estado': grupo.estado}
+            data = {'nombre': grupo.nombre, 'estado': grupo.estado}
             form = GrupoForm(initial=data)
         return render(request, 'inventario/inv_grupos.html', {'form': form})
 
 
 @login_required
 def get_marca(request, pk, mode):
-    print(request.method)
     if mode == "INS":
         if request.method == "POST":
             form = MarcaForm(request.POST)
             if form.is_valid():
                 marca = form.save()
+
+                # Auditoria
+                marca.usuarioCreacion = request.user.username
+                marca.usuarioModificacion = request.user.username
+
                 marca.save()
                 return redirect('inventario:inv_inicio')
         else:
@@ -83,6 +100,9 @@ def get_marca(request, pk, mode):
         return render(request, 'inventario/inv_marcas.html', {'form': form})
     else:
         marca = get_object_or_404(Marca, pk=pk)
+        # Auditoria
+        marca.usuarioModificacion = request.user.username
+        marca.fechaModificacion = datetime.datetime.now()
         if request.method == 'POST':
             form = MarcaForm(data=request.POST, instance=marca)
             if form.is_valid():
@@ -92,7 +112,7 @@ def get_marca(request, pk, mode):
             else:
                 print('No valid form')
         else:
-            data = {'codigo': marca.codigo, 'nombre': marca.nombre, 'estado': marca.estado}
+            data = {'nombre': marca.nombre, 'estado': marca.estado}
             form = MarcaForm(initial=data)
         return render(request, 'inventario/inv_marcas.html', {'form': form})
 
@@ -102,21 +122,28 @@ def get_item(request, pk, mode):
     fecha = datetime.datetime.now().strftime("%d-%m-%Y")
     tiempo = datetime.datetime.now().strftime("%H:%M%p")
     precio = 0
+    item_precios = ItemPrecios.objects.filter(item__codigo=pk).order_by('-fecVigencia')
 
     if mode == "INS":
         if request.method == "POST":
             form = ItemForm(request.POST)
             if form.is_valid():
                 item = form.save()
+                # Auditoria
+                item.usuarioCreacion = request.user.username
+                item.usuarioModificacion = request.user.username
                 item.save()
-                return redirect('inventario:inv_inicio')
+                return redirect('inventario:get_item', pk=item.id, mode='UPD')
         else:
             form = ItemForm
+
         return render(request, 'inventario/inv_items.html', {'form': form,
                                                              'mode': mode})
     else:
         item = get_object_or_404(Item, pk=pk)
-        item_precios = ItemPrecios.objects.filter(item__codigo=item.codigo).order_by('-fecVigencia')
+        # Auditoria
+        item.usuarioModificacion = request.user.username
+        item.fechaModificacion = datetime.datetime.now()
         if request.method == 'POST':
             form = ItemForm(data=request.POST, instance=item)
             if form.is_valid():
@@ -130,7 +157,7 @@ def get_item(request, pk, mode):
                     'nombre': item.nombre,
                     'estado': item.estado,
                     'grupo': item.grupo,
-                    'marca': item.marca,}
+                    'marca': item.marca}
             form = ItemForm(initial=data)
         return render(request, 'inventario/inv_items.html', {'form': form,
                                                              'item': item,
@@ -141,11 +168,6 @@ def get_item(request, pk, mode):
 
 
 @login_required
-def get_precio(request, pk, fecVigencia, precio):
-    print(request)
-    pass
-
-
 def set_precio(request):
     # Se obtienen los valores del post
     item_pk = request.POST.get('item_pk', '')

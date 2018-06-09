@@ -5,9 +5,9 @@ Python 3.4 y Django 2.0.
 El fin de este repositorio es poder realizar practicas en conjunto, sobre el control de versiones y 
 generación de los modulos del sistema mismo.
 
-El branch _master_ del proyecto se encuentra expuesto en **Heroku** en el siguiente enlace [enlace](https://codexcitingerp.herokuapp.com/).
+El branch _master_ del proyecto se encuentra expuesto en **Heroku** en el siguiente [enlace](https://codexcitingerp.herokuapp.com/accounts/login).
 
-**Tecnologias** <br>
+**Tecnologías** <br>
 
 Lo descrito a continuación son las tecnologías utilizadas en la realización del proyecto.
 
@@ -20,6 +20,10 @@ Lo descrito a continuación son las tecnologías utilizadas en la realización d
 > Bootstrap 4.1 <br>
 > MaterializeCSS 1.0 <br>
 > JQuery 3.3.1 <br>
+
+<br>
+
+**EJECUTANDO LOCALMENTE**
 
 **Instalando librerias para python.** <br>
 

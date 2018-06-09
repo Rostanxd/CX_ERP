@@ -6,11 +6,9 @@ from .models import Grupo, Marca, Item
 class GrupoForm(forms.ModelForm):
     class Meta:
         model = Grupo
-        fields = ['codigo',
-                  'nombre',
+        fields = ['nombre',
                   'estado']
-        labels = {'codigo': 'Código',
-                  'nombre': 'Nombre',
+        labels = {'nombre': 'Nombre',
                   'estado': 'Estado',
                   }
 
@@ -18,11 +16,9 @@ class GrupoForm(forms.ModelForm):
 class MarcaForm(forms.ModelForm):
     class Meta:
         model = Marca
-        fields = ['codigo',
-                  'nombre',
+        fields = ['nombre',
                   'estado']
-        labels = {'codigo': 'Código',
-                  'nombre': 'Nombre',
+        labels = {'nombre': 'Nombre',
                   'estado': 'Estado',
                   }
 

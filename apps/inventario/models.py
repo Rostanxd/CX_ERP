@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 """ESTADOS MAESTOS"""
 ACTIVO = 'A'
@@ -23,9 +24,13 @@ ESTADOS_TRANSACCIONALES = [
 
 # CLASES DE INVENTARIO
 class Grupo(models.Model):
-    codigo = models.CharField(max_length=3, primary_key=True, db_column='mrcCodigo')
+    id = models.AutoField(primary_key=True, editable=False, db_column="gruId")
     nombre = models.CharField(max_length=25, db_column='gruNombre')
     estado = models.CharField(max_length=1, choices=ESTADOS_MAESTROS, db_column='gruEstado')
+    usuarioCreacion = models.CharField(max_length=10, db_column="gruUsrCreacion", default="")
+    fechaCreacion = models.DateTimeField(auto_now=True, db_column="gruFecCreacion")
+    usuarioModificacion = models.CharField(max_length=10, db_column="gruUsrModificacion", default="")
+    fechaModificacion = models.DateTimeField(auto_now=True, db_column="gruFecModificacion")
 
     class Meta:
         db_table = 'inv_grupos'
@@ -41,9 +46,13 @@ class Grupo(models.Model):
 
 
 class Marca(models.Model):
-    codigo = models.CharField(max_length=3, primary_key=True, db_column="mrcCodigo")
+    id = models.AutoField(primary_key=True, editable=False, db_column="mrcId")
     nombre = models.CharField(max_length=25, db_column="mrcNombre")
     estado = models.CharField(max_length=1, choices=ESTADOS_MAESTROS, db_column="mrcEstado")
+    usuarioCreacion = models.CharField(max_length=10, db_column="mrcUsrCreacion", default="")
+    fechaCreacion = models.DateTimeField(auto_now=True, db_column="mrcFecCreacion")
+    usuarioModificacion = models.CharField(max_length=10, db_column="mrcUsrModificacion", default="")
+    fechaModificacion = models.DateTimeField(auto_now=True, db_column="mrcFecModificacion")
 
     class Meta:
         db_table = 'inv_marcas'
@@ -59,23 +68,24 @@ class Marca(models.Model):
 
 
 class Item(models.Model):
-    codigo = models.CharField(max_length=25, primary_key=True, db_column="itmCodigo")
+    id = models.AutoField(primary_key=True, editable=False, db_column="itmId")
+    codigo = models.CharField(max_length=25, db_column="itmCodigo")
     nombre = models.CharField(max_length=25, db_column="itmNombre")
     estado = models.CharField(max_length=1, choices=ESTADOS_MAESTROS, db_column="itmEstado")
     usuarioCreacion = models.CharField(max_length=10, db_column="itmUsrCreacion")
-    fechaCreacion = models.DateTimeField(auto_now_add=True, db_column="itmFecCreacion")
+    fechaCreacion = models.DateTimeField(auto_now=True, db_column="itmFecCreacion")
     usuarioModificacion = models.CharField(max_length=10, db_column="itmUsrModificacion")
     fechaModificacion = models.DateTimeField(auto_now=True, db_column="itmFecModificacion")
     marca = models.ForeignKey(Marca,
                               models.SET_NULL,
                               blank=True,
                               null=True,
-                              db_column='mrcCodigo')
+                              db_column='mrcId')
     grupo = models.ForeignKey(Grupo,
                               models.SET_NULL,
                               blank=True,
                               null=True,
-                              db_column='gruCodigo')
+                              db_column='gruId')
 
     class Meta:
         db_table = 'inv_items'
@@ -92,14 +102,13 @@ class Item(models.Model):
 
 class ItemPrecios(models.Model):
     item = models.ForeignKey(Item,
-                             db_column="itmCodigo",
+                             db_column="itmId",
                              on_delete=models.CASCADE,
                              )
     fecVigencia = models.DateTimeField(db_column="itmPreFecVigencia")
-    precio = models.DecimalField(max_digits=9, decimal_places=2, db_column="itmPrecio")
-    models.DateTimeField(auto_now_add=True, db_column="itmFecCreacion")
-    usuarioModificacion = models.CharField(max_length=10, db_column="itmUsrModificacion")
-    fechaModificacion = models.DateTimeField(auto_now=True, db_column="itmFecModificacion")
+    precio = models.DecimalField(max_digits=9, decimal_places=2, db_column="itmPreValor")
+    usuarioCreacion = models.CharField(max_length=10, db_column="itmPreUsrModificacion", default="")
+    fechaCreacion = models.DateTimeField(auto_now=True, db_column="itmPreFecModificacion")
 
     class Meta:
         db_table = 'inv_items_precios'

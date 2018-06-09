@@ -11,7 +11,11 @@
       <form action="" method="post" style="padding-top: 15px">
         {% csrf_token %}
         {% form form=form %}{% endform %}
-        <input class="waves-effect waves-light btn" type="submit" value="Registrar"/>
+        {% if mode == 'INS' %}
+          <input class="waves-effect waves-light btn" type="submit" value="Registrar"/>
+        {% else %}
+          <input class="waves-effect waves-light btn" type="submit" value="Guardar"/>
+        {% endif %}
         <a class="waves-effect waves-light btn red lighten-1" href="{% url 'inventario:inv_inicio' %}">
           Cancelar</a>
       </form>
@@ -109,7 +113,7 @@
   </script>
   <script>
     $('#add_item').click(function (e) {
-      var item_pk = $('#id_codigo').val()
+      var item_pk = '{{ item.pk }}';
       var fecha_vigencia = $('#fecha_vigencia').val();
       var tiempo_vigencia = $('#tiempo_vigencia').val();
       var precio = $('#precio').val();
