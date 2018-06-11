@@ -22,7 +22,7 @@
     </div>
     <div class="col s12 m6 l6">
       <h5>Histórico de Precios</h5>
-      <table class="highlight striped">
+      <table class="striped">
         <thead>
           <tr>
             <th style="text-align: center">Fecha</th>
@@ -33,8 +33,8 @@
             {% if item_precios %}
               {% for ip in item_precios %}
                 <tr>
-                  <td>{{ ip.fecVigencia }}</td>
-                  <td style="text-align: right">$ {{ ip.precio }}</td>
+                  <td>{{ ip.dtm_fecha_vigencia }}</td>
+                  <td style="text-align: right">$ {{ ip.dec_precio }}</td>
                 </tr>
               {% endfor %}
             {% else %}
@@ -60,15 +60,16 @@
         <div class="input-field col s4 m4 l4">
           <label for="tiempo_vigencia">Tiempo:</label>
           {% if mode != 'INS' %}
-            <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" {{ tiempo }}>
+            <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" value="{{ tiempo }}">
           {% else %}
-            <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" {{ tiempo }} disabled>
+            <input id="tiempo_vigencia" name="tiempo_vigencia" type="text" class="timepicker" value="{{ tiempo }}" disabled>
           {% endif %}
         </div>
         <div class="input-field col s4 m4 l4">
           <label for="precio">Nuevo Precio:</label>
           {% if mode != 'INS' %}
-            <input id="precio" name="precio" type="number" step="any" value="{{ precio }}">
+            <input id="precio" name="precio" type="number" step="0.01" placeholder="0.00" pattern="^\d+(?:\.\d{1,2})?$"
+                   value="{{ precio }}">
           {% else %}
             <input id="precio" name="precio" type="number" step="any" value="{{ precio }}" disabled>
           {% endif %}
@@ -113,20 +114,20 @@
   </script>
   <script>
     $('#add_item').click(function (e) {
-      var item_pk = '{{ item.pk }}';
-      var fecha_vigencia = $('#fecha_vigencia').val();
-      var tiempo_vigencia = $('#tiempo_vigencia').val();
-      var precio = $('#precio').val();
-      var flag = false;
+      var int_item_pk = '{{ item.pk }}';
+      var dat_fecha_vigencia = $('#fecha_vigencia').val();
+      var tim_tiempo_vigencia = $('#tiempo_vigencia').val();
+      var dec_precio = $('#precio').val();
+      var bol_flag = false;
 
-      if (precio != 0 && fecha_vigencia != '' && tiempo_vigencia != '') {
-        flag = true;
+      if (dec_precio != 0 && dat_fecha_vigencia != '' && tim_tiempo_vigencia != '') {
+        bol_flag = true;
       }else{
-        flag = false;
+        bol_flag = false;
         alert('Por favor ingrese todos los datos para el nuevo precio...')
       }
 
-      if (flag) {
+      if (bol_flag) {
         if (confirm("Desea agregar el nuevo precio ?") == true) {
 
           console.log('#add_item: click');
@@ -138,15 +139,16 @@
             url: '/inventario/item_set_precio/',
             data: {
               csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
-              'item_pk': item_pk,
-              'fecha_vigencia': fecha_vigencia,
-              'tiempo_vigencia': tiempo_vigencia,
-              'precio': precio
+              'item_pk': int_item_pk,
+              'fecha_vigencia': dat_fecha_vigencia,
+              'tiempo_vigencia': tim_tiempo_vigencia,
+              'precio': dec_precio
             },
             datetype: 'json',
             success: function (data) {
               if (data.mensaje) {
-                alert('Ha sido agregado el nuevo precio!');
+                //  Imprimer el mensaje del backend.
+                alert(data.mensaje);
                 setTimeout(function () {  // espera por 0.5 segundos
                   location.reload(); // luego recarga la página
                 }, 500);

@@ -5,13 +5,26 @@
 {% endblock %}
 
 {% block body_container %}
-  <form action="" method="post" style="padding-top: 15px">
-    {% csrf_token %}
-    {% form form=form %}{% endform %}
-    <input class="waves-effect waves-light btn" type="submit" value="Registrar"/>
-    <a class="waves-effect waves-light btn red lighten-1" href="{% url 'inventario:inv_inicio' %}">
-      Cancelar</a>
-  </form>
+  <div class="row">
+    <div class="col s12 m12 l12">
+      <div class="card">
+        <div class="card-content">
+          {% if mode == 'INS' %}
+            <span class="card-title">Ingresar Marca</span>
+          {% else %}
+            <span class="card-title">Detalles de la Marca</span>
+          {% endif %}
+          <form action="" method="post" style="padding-top: 15px">
+            {% csrf_token %}
+            {% form form=form %}{% endform %}
+            <input class="waves-effect waves-light btn" type="submit" value="Registrar"/>
+            <a class="waves-effect waves-light btn red lighten-1" href="{% url 'inventario:inv_inicio' %}">
+              Cancelar</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block footer %}

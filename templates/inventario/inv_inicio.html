@@ -26,7 +26,7 @@
               {% if grupos_all %}
                 {% for grupo in grupos_all %}
                   <tr>
-                    <td>{{ grupo.nombre }}</td>
+                    <td>{{ grupo.str_nombre }}</td>
                     <td style="text-align: center">{{ grupo.estado_nombre }}</td>
                     <td style="text-align: center">
                       <a href="{% url 'inventario:get_grupo' grupo.pk 'UPD' %}" class="blue-grey-text"><i class="fas fa-edit"></i></a>
@@ -99,7 +99,7 @@
               {% if marcas_all %}
                 {% for marca in marcas_all %}
                   <tr>
-                    <td>{{ marca.nombre }}</td>
+                    <td>{{ marca.str_nombre }}</td>
                     <td style="text-align: center">{{ marca.estado_nombre }}</td>
                     <td style="text-align: center">
                       <a href="{% url 'inventario:get_marca' marca.pk 'UPD' %}" class="blue-grey-text"><i class="fas fa-edit"></i></a>
@@ -173,8 +173,8 @@
               {% if items_all %}
                 {% for item in items_all %}
                   <tr>
-                    <td>{{ item.codigo }}</td>
-                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.str_codigo }}</td>
+                    <td>{{ item.str_nombre }}</td>
                     <td>{{ item.estado_nombre }}</td>
                     <td style="text-align: center">
                       <a href="{% url 'inventario:get_item' item.pk 'UPD' %}" class="blue-grey-text"><i class="fas fa-edit"></i></a>
