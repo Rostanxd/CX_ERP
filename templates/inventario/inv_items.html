@@ -16,7 +16,7 @@
         {% else %}
           <input class="waves-effect waves-light btn" type="submit" value="Guardar"/>
         {% endif %}
-        <a class="waves-effect waves-light btn red lighten-1" href="{% url 'inventario:inv_inicio' %}">
+        <a class="waves-effect waves-light btn red lighten-1" href="{% url 'inventario:admin_items' %}">
           Cancelar</a>
       </form>
     </div>
@@ -136,7 +136,7 @@
 
           $.ajax({
             type: 'POST',
-            url: '/inventario/item_set_precio/',
+            url: '{% url 'inventario:itm_set_precio' %}',
             data: {
               csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
               'item_pk': int_item_pk,
@@ -144,7 +144,7 @@
               'tiempo_vigencia': tim_tiempo_vigencia,
               'precio': dec_precio
             },
-            datetype: 'json',
+            datatype: 'json',
             success: function (data) {
               if (data.mensaje) {
                 //  Imprimer el mensaje del backend.

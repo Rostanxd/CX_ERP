@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import ListView
 
 from .models import Grupo, Marca, Item, ItemPrecios
 from .forms import GrupoForm, MarcaForm, ItemForm
@@ -187,7 +189,7 @@ def get_item(request, pk, mode):
             if form.is_valid():
                 post = form.save(commit=False)
                 post.save()
-                return redirect('inventario:inv_inicio')
+                return redirect('inventario:admin_items')
             else:
                 print('No valid form!!')
         else:
@@ -230,9 +232,94 @@ def set_precio(request):
     item_precio.save()
 
     # Mensaje desde el back end
+
     data = {
         'mensaje': 'Se ha agregado el nuevo precio!!'
     }
 
     # Respuesta en Json del backend.
     return JsonResponse(data)
+
+
+def filter_items(request):
+    itm_codigo = request.POST.get('itm_codigo', '')
+    itm_estado = request.POST.get('itm_estado', '')
+    itm_nombre = request.POST.get('itm_nombre', '')
+    itm_grupo = request.POST.get('itm_grupo', 0)
+    itm_marca = request.POST.get('itm_marca', 0)
+
+    # Filtro los items bajo las siguientes condiciones
+    filtered_items = Item.objects.filter(str_codigo__contains=itm_codigo,
+                                         str_estado__contains=itm_estado,
+                                         str_nombre__contains=itm_nombre,
+                                         )
+
+    # En caso de haber filtrado un grupo, lo incluye en los filtros
+    if itm_grupo != 0:
+        filtered_items.filter(mod_grupo__int_id=itm_grupo).exclude(mod_grupo__isnull=True)
+
+    # En caso de haber filtrado una marca, la incluye en los filtros
+    if itm_marca != 0:
+        filtered_items.filter(mod_marca__int_id=itm_marca).exclude(mod_marca__isnull=True)
+
+    print(filtered_items)
+
+    list_items = []
+    for item in filtered_items:
+        str_grupo = ''
+        str_marca = ''
+        if item.mod_grupo:
+            str_grupo = item.mod_grupo.str_nombre
+
+        if item.mod_marca:
+            str_marca = item.mod_marca.str_nombre
+
+        dic_item = {'int_id': item.int_id, 'str_codigo': item.str_codigo,
+                    'str_nombre': item.str_nombre, 'str_grupo': str_grupo,
+                    'str_marca': str_marca}
+
+        list_items.append(dic_item)
+
+    # Devuelve la data.
+    data = {
+        # 'filtered_items': serializers.serialize('json', list_items),
+        'filtered_items': list_items,
+        'count_filtered_items': filtered_items.count(),
+    }
+
+    return JsonResponse(data)
+
+
+def delete_item(request):
+    itm_id = request.POST.get('itm_id', '')
+
+    itm = get_object_or_404(Item, pk=itm_id)
+    itm.str_estado = 'I'
+    itm.save()
+
+    data = {
+        'mensaje': 'El item a sido dado de baja.'
+    }
+
+    return JsonResponse(data)
+
+
+# Clase para listar los items
+class ItemListView(ListView):
+    model = Item
+    template_name = 'inventario/inv_adm_items.html'
+    paginate_by = 15
+
+    def get_queryset(self):
+        return Item.objects.filter(str_estado__contains='A')
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        context['contador'] = Item.objects.filter(str_estado__contains='A').count()
+        context['grupos'] = Grupo.objects.all()
+        context['marcas'] = Marca.objects.all()
+        context['est_maestros'] = ESTADOS_MAESTROS
+
+        return context

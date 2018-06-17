@@ -1,0 +1,293 @@
+{% extends 'base/main_base.html' %}
+
+{% block head_libs %}
+  <style>
+   .selected-row {
+     background-color: #1976d2  !important;
+     color: #FFF !important;
+   }
+  </style>
+{% endblock %}
+
+{% block body_container %}
+    {# Lista de productos #}
+  <div class="col s12 m12 l12">
+    <div class="card">
+      <div class="card-content">
+        <div class="row">
+          <!-- Titulo -->
+          <div class="row">
+            <span class="card-title" style="padding-top: 10px;">Productos</span>
+          </div>
+
+          <!-- Botones de accion y busqueda -->
+          <div class="row">
+            <!-- Dropdown Structure -->
+            <ul id="dropdown-action" class="dropdown-content">
+              <li><a href="{% url 'inventario:get_item' ' ' 'INS' %}">Nuevo<span class="badge"><i class="far fa-file"></i></span></a></li>
+              <li><a href="#!" onclick="editar_item()">Editar<span class="badge"><i class="fas fa-edit"></i></span></a></li>
+              <li><a href="#!" onclick="anular_item()">Anular<span class="badge"><i class="fas fa-ban"></i></span></a></li>
+            </ul>
+
+            <!-- Dropdown Trigger -->
+            <a class="btn dropdown-button" href="#!" data-activates="dropdown-action">Accion
+              <i class="material-icons right">arrow_drop_down</i></a>
+
+            <!-- Boton para llamar al modal de los filtros -->
+            <a class="btn modal-trigger" data-target="modal1" >Filtrar<i class="material-icons right">search</i></a>
+          </div>
+
+          <!-- Tabla con la lista de items -->
+          <table id="tab_items_lista" class="striped highlight">
+            <thead>
+              <tr>
+                <th style="display: none;">Id</th>
+                <th style="text-align: center">Código</th>
+                <th style="text-align: center">Nombre</th>
+                <th style="text-align: center">Grupo</th>
+                <th style="text-align: center">Marca</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if object_list %}
+                {% for item in object_list %}
+                  <tr class="">
+                    <td id="itm_id" style="display: none">{{ item.int_id }}</td>
+                    <td>{{ item.str_codigo }}</td>
+                    <td>{{ item.str_nombre }}</td>
+                    <td>{{ item.mod_grupo.str_nombre }}</td>
+                    <td>{{ item.mod_marca.str_nombre }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="6">No hay registros.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+
+          <!-- Pagineo de la tabla -->
+          {% if is_paginated %}
+            <ul class="pagination">
+              {% if page_obj.has_previous %}
+                <li class="waves-effect">
+                  <a href="?page={{ page_obj.previous_page_number }}">
+                    <i class="material-icons">chevron_left</i>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <i class="material-icons">chevron_left</i>
+                  </span>
+                </li>
+              {% endif %}
+              {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                  <li class="active"><a href="#!">{{ i }}</a></li>
+                {% else %}
+                  <li class="waves-effect"><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+              {% endfor %}
+              {% if page_obj.has_next %}
+                <li>
+                  <a href="?page={{ page_obj.next_page_number }}">
+                    <i class="material-icons">chevron_right</i>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <i class="material-icons">chevron_right</i>
+                  </span>
+                </li>
+              {% endif %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <!-- Pie del card -->
+        <div class="card-action">
+          <span>Total de productos: {{ contador }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal1" class="modal bottom-sheet">
+    <div class="modal-content">
+      <h4>Filtros</h4>
+      <div class="row">
+        <form id="item_search_form" method="POST" class="form" role="form" action="">
+          {% csrf_token %}
+          <div class="input-field col s12 m6 l6">
+            <input id="codigo" type="text" class="validate">
+            <label for="codigo">Código</label>
+          </div>
+          <div class="input-field col s12 m6 l6">
+            <select id="estado">
+              <option value="" selected>Seleccionar...</option>
+              {% for estado in est_maestros %}
+                <option value="{{ estado.0 }}">{{ estado.1 }}</option>
+              {% endfor %}
+            </select>
+            <label>Estado</label>
+          </div>
+          <div class="input-field col s12">
+            <input id="nombre" type="text" class="validate">
+            <label for="nombre">Nombre</label>
+          </div>
+          <div class="input-field col s12">
+            <select id="grupos">
+              <option value="0" selected>Seleccionar...</option>
+              {% for grupo in grupos %}
+                <option value="{{ grupo.int_id }}">{{ grupo.str_nombre }}</option>
+              {% endfor %}
+            </select>
+            <label>Grupo</label>
+          </div>
+          <div class="input-field col s12">
+            <select id="marcas">
+              <option value="0" selected>Seleccionar...</option>
+              {% for marca in marcas %}
+                <option value="{{ marca.int_id }}">{{ marca.str_nombre }}</option>
+              {% endfor %}
+            </select>
+            <label>Marca</label>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a id="btn_buscar_item" href="#!" class="modal-close waves-effect waves-green btn-flat">Buscar</a>
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
+    </div>
+  </div>
+{% endblock %}
+
+
+{% block document_ready_js %}
+
+{% endblock %}
+
+{% block body_js %}
+  <script type="text/javascript">
+    $('.modal').modal();
+  </script>
+  <script type="text/javascript">
+    $('#tab_items_lista tbody tr').click(function () {
+      $(this).addClass('selected-row').siblings().removeClass('selected-row');
+    });
+  </script>
+  <script type="text/javascript">
+    $('#btn_buscar_item').click(function (e) {
+      var itm_codigo = $('#codigo').val();
+      var itm_estado = $('#estado option:selected').val();
+      var itm_nombre = $('#nombre').val();
+      var itm_grupo = $('#grupos option:selected').val();
+      var itm_marca = $('#marcas option:selected').val();
+
+      $.ajax({
+        type: 'POST',
+        url: '{% url 'inventario:filter_item' %}',
+        data: {
+          csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+          'itm_codigo': itm_codigo,
+          'itm_estado': 'A',
+          'itm_nombre': itm_nombre,
+          'itm_marca': itm_marca,
+          'itm_grupo': itm_grupo
+        },
+        datetype: 'json',
+        success: function (data) {
+          if (data.filtered_items){
+            //  Limpio el contenido de la tabla
+            $('#tab_items_lista > tbody').empty();
+            $('.card-action').empty();
+
+            var filtered_items = data.filtered_items;
+
+            console.log(filtered_items);
+
+            $.each(filtered_items, function (a) {
+              var tab_itm_id = filtered_items[a].int_id;
+              var tab_itm_codigo = filtered_items[a].str_codigo;
+              var tab_itm_nombre = filtered_items[a].str_nombre;
+              var tab_itm_grupo = filtered_items[a].str_grupo;
+              var tab_itm_marca = filtered_items[a].str_marca;
+
+              $('#tab_items_lista > tbody').append('<tr class><td style="display: none;" id="itm_id">' +
+                      tab_itm_id + '</td><td>' + tab_itm_codigo +
+                      '</td><td>' + tab_itm_nombre + '</td><td>' +
+                      tab_itm_grupo + '</td><td>' + tab_itm_marca + '</td></tr>');
+
+{#              console.log(JSON.parse(filtered_items)[a]);#}
+{#              var tab_itm_codigo = JSON.parse(filtered_items)[a].fields.str_codigo;#}
+{#              var tab_itm_nombre = JSON.parse(filtered_items)[a].fields.str_nombre;#}
+{#              var tab_itm_estado = JSON.parse(filtered_items)[a].fields.estado_nombre;#}
+{#              $('#tab_items_lista > tbody').append('<tr><td>' + tab_itm_codigo + '</td><td>' +#}
+{#                      tab_itm_nombre + '</td><td>' + tab_itm_estado + '</td>');#}
+
+            });
+
+            $('.card-action').append('<span>Total de registros: ' + data.count_filtered_items + '</span>')
+          }
+        },
+        error: function(data){
+          alert('Ups! ocurrió un error' +  data);
+        }
+      });
+    });
+  </script>
+  <script type="text/javascript">
+    function item_seleccionado() {
+      var itm_id = $('.selected-row #itm_id').text();
+      if (itm_id){
+        return itm_id;
+      }else{
+        alert('No has seleccionado ninguna registro!')
+      }
+    }
+
+    function editar_item(){
+      var itm = item_seleccionado();
+      if (itm){
+       location.href = "../item/" + itm + "/UPD/"
+      }
+    }
+
+    function anular_item(){
+      var itm = item_seleccionado();
+      console.log('Anulando item: ' + itm);
+      if (itm) {
+        if (confirm("Esta seguro de querer inactivar este producto?")){
+          $.ajax({
+            type: 'POST',
+            url: '{% url 'inventario:delete_item' %}',
+            data: {
+              csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+              'itm_id': itm
+            },
+            datatype: 'jason',
+            success: function(data){
+              if (data.mensaje){
+                alert(data.mensaje);
+                setTimeout(function () {  // espera por 0.5 segundos
+                    location.reload(); // luego recarga la página
+                  }, 500);
+              }
+            },
+            error: function () {
+              alert('Ups! ocurrió un error.');
+            }
+          });
+        }
+      }
+    }
+  </script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
