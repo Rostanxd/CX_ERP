@@ -3,7 +3,7 @@
 {% block head_libs %}
   <style>
    .selected-row {
-     background-color: #1976d2  !important;
+     background-color: #41a2d2 !important;
      color: #FFF !important;
    }
   </style>
@@ -11,106 +11,98 @@
 
 {% block body_container %}
     {# Lista de productos #}
-  <div class="col s12 m12 l12">
-    <div class="card">
-      <div class="card-content">
-        <div class="row">
-          <!-- Titulo -->
-          <div class="row">
-            <span class="card-title" style="padding-top: 10px;">Productos</span>
-          </div>
+  <div class="card">
+    <div class="card-content">
+      <!-- Titulo -->
+      <span class="card-title" style="padding-top: 10px;">Productos</span>
 
-          <!-- Botones de accion y busqueda -->
-          <div class="row">
-            <!-- Dropdown Structure -->
-            <ul id="dropdown-action" class="dropdown-content">
-              <li><a href="{% url 'inventario:get_item' ' ' 'INS' %}">Nuevo<span class="badge"><i class="far fa-file"></i></span></a></li>
-              <li><a href="#!" onclick="editar_item()">Editar<span class="badge"><i class="fas fa-edit"></i></span></a></li>
-              <li><a href="#!" onclick="anular_item()">Anular<span class="badge"><i class="fas fa-ban"></i></span></a></li>
-            </ul>
+      <!-- Botones de accion y busqueda -->
+      <!-- Dropdown Structure -->
+      <ul id="dropdown-action" class="dropdown-content">
+        <li><a href="{% url 'inventario:get_item' ' ' 'INS' %}">Nuevo<span class="badge"><i class="far fa-file"></i></span></a></li>
+        <li><a href="#!" onclick="editar_item()">Editar<span class="badge"><i class="fas fa-edit"></i></span></a></li>
+        <li><a href="#!" onclick="anular_item()">Anular<span class="badge"><i class="fas fa-ban"></i></span></a></li>
+      </ul>
 
-            <!-- Dropdown Trigger -->
-            <a class="btn dropdown-button" href="#!" data-activates="dropdown-action">Accion
-              <i class="material-icons right">arrow_drop_down</i></a>
+      <!-- Dropdown Trigger -->
+      <a class="btn dropdown-button" href="#!" data-activates="dropdown-action">Accion
+        <i class="material-icons right">arrow_drop_down</i></a>
 
-            <!-- Boton para llamar al modal de los filtros -->
-            <a class="btn modal-trigger" data-target="modal1" >Filtrar<i class="material-icons right">search</i></a>
-          </div>
+      <!-- Boton para llamar al modal de los filtros -->
+      <a class="btn modal-trigger" data-target="modal1" >Filtrar<i class="material-icons right">search</i></a>
 
-          <!-- Tabla con la lista de items -->
-          <table id="tab_items_lista" class="striped highlight">
-            <thead>
-              <tr>
-                <th style="display: none;">Id</th>
-                <th style="text-align: center">Código</th>
-                <th style="text-align: center">Nombre</th>
-                <th style="text-align: center">Grupo</th>
-                <th style="text-align: center">Marca</th>
+      <!-- Tabla con la lista de items -->
+      <table id="tab_items_lista" class="striped highlight">
+        <thead>
+          <tr>
+            <th style="display: none;">Id</th>
+            <th style="text-align: center">Código</th>
+            <th style="text-align: center">Nombre</th>
+            <th style="text-align: center">Grupo</th>
+            <th style="text-align: center">Marca</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if object_list %}
+            {% for item in object_list %}
+              <tr class="">
+                <td id="itm_id" style="display: none">{{ item.int_id }}</td>
+                <td>{{ item.str_codigo }}</td>
+                <td>{{ item.str_nombre }}</td>
+                <td style="text-align: center">{{ item.mod_grupo.str_nombre }}</td>
+                <td style="text-align: center">{{ item.mod_marca.str_nombre }}</td>
               </tr>
-            </thead>
-            <tbody>
-              {% if object_list %}
-                {% for item in object_list %}
-                  <tr class="">
-                    <td id="itm_id" style="display: none">{{ item.int_id }}</td>
-                    <td>{{ item.str_codigo }}</td>
-                    <td>{{ item.str_nombre }}</td>
-                    <td>{{ item.mod_grupo.str_nombre }}</td>
-                    <td>{{ item.mod_marca.str_nombre }}</td>
-                  </tr>
-                {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="6">No hay registros.</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-
-          <!-- Pagineo de la tabla -->
-          {% if is_paginated %}
-            <ul class="pagination">
-              {% if page_obj.has_previous %}
-                <li class="waves-effect">
-                  <a href="?page={{ page_obj.previous_page_number }}">
-                    <i class="material-icons">chevron_left</i>
-                  </a>
-                </li>
-              {% else %}
-                <li class="disabled">
-                  <span>
-                    <i class="material-icons">chevron_left</i>
-                  </span>
-                </li>
-              {% endif %}
-              {% for i in paginator.page_range %}
-                {% if page_obj.number == i %}
-                  <li class="active"><a href="#!">{{ i }}</a></li>
-                {% else %}
-                  <li class="waves-effect"><a href="?page={{ i }}">{{ i }}</a></li>
-                {% endif %}
-              {% endfor %}
-              {% if page_obj.has_next %}
-                <li>
-                  <a href="?page={{ page_obj.next_page_number }}">
-                    <i class="material-icons">chevron_right</i>
-                  </a>
-                </li>
-              {% else %}
-                <li class="disabled">
-                  <span>
-                    <i class="material-icons">chevron_right</i>
-                  </span>
-                </li>
-              {% endif %}
-            </ul>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6">No hay registros.</td>
+            </tr>
           {% endif %}
-        </div>
+        </tbody>
+      </table>
 
-        <!-- Pie del card -->
-        <div class="card-action">
-          <span>Total de productos: {{ contador }}</span>
-        </div>
+      <!-- Pagineo de la tabla -->
+      {% if is_paginated %}
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="waves-effect">
+              <a href="?page={{ page_obj.previous_page_number }}">
+                <i class="material-icons">chevron_left</i>
+              </a>
+            </li>
+          {% else %}
+            <li class="disabled">
+              <span>
+                <i class="material-icons">chevron_left</i>
+              </span>
+            </li>
+          {% endif %}
+          {% for i in paginator.page_range %}
+            {% if page_obj.number == i %}
+              <li class="active"><a href="#!">{{ i }}</a></li>
+            {% else %}
+              <li class="waves-effect"><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li>
+              <a href="?page={{ page_obj.next_page_number }}">
+                <i class="material-icons">chevron_right</i>
+              </a>
+            </li>
+          {% else %}
+            <li class="disabled">
+              <span>
+                <i class="material-icons">chevron_right</i>
+              </span>
+            </li>
+          {% endif %}
+        </ul>
+      {% endif %}
+
+      <!-- Pie del card -->
+      <div class="card-action">
+        <span>Total de productos: {{ contador }}</span>
       </div>
     </div>
   </div>
@@ -220,8 +212,8 @@
 
               $('#tab_items_lista > tbody').append('<tr class><td style="display: none;" id="itm_id">' +
                       tab_itm_id + '</td><td>' + tab_itm_codigo +
-                      '</td><td>' + tab_itm_nombre + '</td><td>' +
-                      tab_itm_grupo + '</td><td>' + tab_itm_marca + '</td></tr>');
+                      '</td><td>' + tab_itm_nombre + '</td><td style="text-align: center">' +
+                      tab_itm_grupo + '</td><td style="text-align: center">' + tab_itm_marca + '</td></tr>');
 
 {#              console.log(JSON.parse(filtered_items)[a]);#}
 {#              var tab_itm_codigo = JSON.parse(filtered_items)[a].fields.str_codigo;#}
